@@ -20,19 +20,13 @@
         <!-- KB Domain Tab -->
         <div class="domain-tab">
             <ul>
-                <li><button class="btn active">KB국민은행</button></li>
-                <li><button class="btn">KB증권</button></li>
-                <li><button class="btn">KB손해보험</button></li>
-                <li><button class="btn">KB국민카드</button></li>
-                <li><button class="btn">푸르덴셜생명</button></li>
-                <li><button class="btn">KB자산운용</button></li>
-                <li><button class="btn">KB캐피탈</button></li>
-                <li><button class="btn">KB생명보험</button></li>
-                <li><button class="btn">KB부동산신탁</button></li>
-                <li><button class="btn">KB저축은행</button></li>
-                <li><button class="btn">KB인베스트먼트</button></li>
-                <li><button class="btn">KB데이타시스템</button></li>
-                <li><button class="btn">KB신용정보</button></li>
+                <li v-for="(item, index) in data" :key="index">
+                    <button :class="['btn', { 'active': item.domain_id === currentDomain.domainId }]"
+                            @click="switchDomain(item)"
+                    >
+                        {{ item.name }}
+                    </button>
+                </li>
             </ul>
         </div>
 
@@ -54,6 +48,9 @@ import { PButton } from '@spaceone/design-system';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import AllSummary from '@/views/dashboard/modules/AllSummary.vue';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
+const DATA_LENGTH = 13;
 
 export default defineComponent({
     name: 'TotalDashboardPage',
@@ -67,7 +64,9 @@ export default defineComponent({
 
         const state = reactive({
             test: false,
-            extraParams: computed(() => (state.test ? { test: true } : {})),
+            extraParams: computed(() => (state.test ? state.currentDomain : {})),
+            data: [],
+            currentDomain: computed(() => vm.$store.state.domain),
         });
 
         /** Init */
@@ -77,8 +76,25 @@ export default defineComponent({
             await vm.$store.dispatch('resource/provider/load');
         })();
 
+        const getDomainList = async (): Promise<void> => {
+            try {
+                const res = await SpaceConnector.client.identity.domain.list();
+                state.data = [
+                    ...res.results.splice(141, DATA_LENGTH),
+                ];
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        getDomainList();
+
+        const switchDomain = (domain) => {
+            vm.$store.dispatch('domain/load', domain.name);
+        };
+
         return {
             ...toRefs(state),
+            switchDomain,
         };
     },
 });
