@@ -31,9 +31,20 @@
         </div>
 
         <!-- If you want to reload when the state is changed, bind key with reactive state. -->
-        <div :key="test.toString()">
+        <div :key="test.toString()" class="contents-wrapper">
             <!-- Give extra parameter objects for api requests in widgets. -->
-            <all-summary :extra-params="extraParams" />
+            <div class="col-span-12 lg:col-span-12
+                        widget-wrapper"
+            >
+                <all-summary :extra-params="extraParams" class="col-span-12" />
+                <resource-map :extra-params="extraParams" class="col-span-12" />
+                <personal-health-dashboard :extra-params="extraParams" class="col-span-12" />
+                <trusted-advisor :extra-params="extraParams" class="col-span-12" />
+                <top-projects :extra-params="extraParams" class="col-span-12" />
+            </div>
+            <!-- <div class="col-span-12 lg:col-span-3
+                    widget-wrapper"
+            /> -->
         </div>
     </general-page-layout>
 </template>
@@ -47,6 +58,10 @@ import { PButton } from '@spaceone/design-system';
 
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import AllSummary from '@/views/dashboard/modules/AllSummary.vue';
+import ResourceMap from '@/views/dashboard/modules/ResourceMap.vue';
+import PersonalHealthDashboard from '@/views/dashboard/modules/PersonalHealthDashboard.vue';
+import TrustedAdvisor from '@/views/dashboard/modules/TrustedAdvisor.vue';
+import TopProjects from '@/views/dashboard/modules/TopProjects.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
@@ -55,9 +70,13 @@ const DATA_LENGTH = 13;
 export default defineComponent({
     name: 'TotalDashboardPage',
     components: {
+        PButton,
         GeneralPageLayout,
         AllSummary,
-        PButton,
+        ResourceMap,
+        PersonalHealthDashboard,
+        TrustedAdvisor,
+        TopProjects,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -80,7 +99,7 @@ export default defineComponent({
             try {
                 const res = await SpaceConnector.client.identity.domain.list();
                 state.data = [
-                    ...res.results.splice(141, DATA_LENGTH),
+                    ...res.results.splice(144, DATA_LENGTH),
                 ];
             } catch (e) {
                 console.error(e);
@@ -104,40 +123,60 @@ export default defineComponent({
 .total-dashboard::v-deep {
     @apply bg-gray-100;
     height: auto;
+    .page-contents {
+        @apply bg-gray-100;
+        max-width: 1368px;
+        padding: 1.5rem;
+        margin: 0 auto;
+    }
 }
+
+.contents-wrapper {
+    display: grid;
+    @apply grid-cols-12;
+    grid-auto-flow: row;
+    grid-gap: 1.25rem;
+}
+
+.widget-wrapper {
+    @apply grid-cols-12;
+    grid-auto-rows: max-content;
+    display: inline-grid;
+    grid-gap: 1.25rem;
+}
+
 .domain-tab {
     position: relative;
-    margin-bottom: 35px;
-}
-.domain-tab > ul {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0 -10px;
-}
-.domain-tab li {
-    width: 208px;
-    margin-top: 12px;
-    padding: 0 10px;
-}
-.domain-tab .btn {
-    overflow: hidden;
-    display: block;
-    width: 100%;
-    height: 41px;
-    padding: 0 20px;
-    text-align: center;
-    font-size: 15px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    background-color: #eee;
-    border-radius: 4px;
-}
-.domain-tab .btn:hover {
-    background-color: #e9e9e9;
-}
-.domain-tab .btn.active {
-    font-weight: bold;
-    color: #fff;
-    background-color: #6638B6;
+    margin-bottom: 3rem;
+    ul {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -10px;
+        li {
+            width: 20%;
+            margin-top: 1rem;
+            padding: 0 10px;
+        }
+    }
+    .btn {
+        overflow: hidden;
+        display: block;
+        width: 100%;
+        height: 3rem;
+        padding: 0 20px;
+        text-align: center;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        background-color: #eee;
+        border-radius: 4px;
+        &:hover {
+            background-color: #e9e9e9;
+        }
+        &.active {
+            font-weight: bold;
+            color: #fff;
+            @apply bg-primary;
+        }
+    }
 }
 </style>
