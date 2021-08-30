@@ -20,7 +20,7 @@
         <!-- KB Domain Tab -->
         <div class="domain-tab">
             <ul>
-                <li v-for="(item, index) in data" :key="index">
+                <li v-for="(item, index) in domainList" :key="index">
                     <button :class="['btn', { 'active': item.domain_id === currentDomain.domainId }]"
                             @click="switchDomain(item)"
                     >
@@ -33,18 +33,36 @@
         <!-- If you want to reload when the state is changed, bind key with reactive state. -->
         <div :key="test.toString()" class="contents-wrapper">
             <!-- Give extra parameter objects for api requests in widgets. -->
-            <div class="col-span-12 lg:col-span-12
+            <div class="col-span-12 lg:col-span-9
                         widget-wrapper"
             >
-                <all-summary :extra-params="extraParams" class="col-span-12" />
-                <resource-map :extra-params="extraParams" class="col-span-12" />
-                <personal-health-dashboard :extra-params="extraParams" class="col-span-12" />
-                <trusted-advisor :extra-params="extraParams" class="col-span-12" />
-                <top-projects :extra-params="extraParams" class="col-span-12" />
+                <all-summary class="col-span-12" :extra-params="extraParams" />
+                <resource-map class="col-span-12" :extra-params="extraParams" />
+                <personal-health-dashboard class="col-span-12" :extra-params="extraParams" />
+                <trusted-advisor class="col-span-12" :extra-params="extraParams" />
+                <top-projects class="col-span-12" :extra-params="extraParams" />
             </div>
-            <!-- <div class="col-span-12 lg:col-span-3
+            <div class="col-span-12 lg:col-span-3
                     widget-wrapper"
-            /> -->
+            >
+                <div class="col-span-12 sm:col-span-6 lg:col-span-12
+                        widget-wrapper"
+                >
+                    <favorites-widget class="hidden lg:block col-span-12"
+                                  :project="project" :cloud-service="cloudService"
+                    />
+                    <daily-updates class="col-span-12 daily-updates"
+                               :providers="providers"
+                    />
+                </div>
+                <div class="col-span-12 sm:col-span-6 lg:col-span-12
+                        widget-wrapper"
+                >
+                    <service-accounts class="col-span-12" :providers="providers" />
+                    <collector-progress class="col-span-12 collector-progress" :extra-params="extraParams" />
+                    <cloud-services class="col-span-12 cloud-services" :more-info="true" :extra-params="extraParams" />
+                </div>
+            </div>
         </div>
     </general-page-layout>
 </template>
@@ -62,6 +80,11 @@ import ResourceMap from '@/views/dashboard/modules/ResourceMap.vue';
 import PersonalHealthDashboard from '@/views/dashboard/modules/PersonalHealthDashboard.vue';
 import TrustedAdvisor from '@/views/dashboard/modules/TrustedAdvisor.vue';
 import TopProjects from '@/views/dashboard/modules/TopProjects.vue';
+import FavoritesWidget from '@/views/dashboard/modules/FavoritesWidget.vue';
+import DailyUpdates from '@/common/modules/DailyUpdates.vue';
+import ServiceAccounts from '@/views/dashboard/modules/ServiceAccounts.vue';
+import CollectorProgress from '@/views/dashboard/modules/CollectingProgress.vue';
+import CloudServices from '@/common/modules/CloudServices.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
@@ -77,28 +100,44 @@ export default defineComponent({
         PersonalHealthDashboard,
         TrustedAdvisor,
         TopProjects,
+        FavoritesWidget,
+        DailyUpdates,
+        ServiceAccounts,
+        CollectorProgress,
+        CloudServices,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
             test: false,
             extraParams: computed(() => (state.test ? state.currentDomain : {})),
-            data: [],
+            domainList: [],
             currentDomain: computed(() => vm.$store.state.domain),
+            providers: computed(() => vm.$store.state.resource.provider.items),
+            project: computed(() => [...vm.$store.getters['favorite/projectGroup/sortedItems'], ...vm.$store.getters['favorite/project/sortedItems']]),
+            cloudService: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
+            timezone: computed(() => vm.$store.state.user.timezone || 'UTC'),
         });
 
         /** Init */
         (async () => {
             // Widgets does not load required resources.
             // Page components need to load resources first.
-            await vm.$store.dispatch('resource/provider/load');
+            await Promise.all([
+                vm.$store.dispatch('resource/provider/load'),
+                vm.$store.dispatch('resource/projectGroup/load'),
+                vm.$store.dispatch('resource/project/load'),
+                vm.$store.dispatch('resource/cloudServiceType/load'),
+                vm.$store.dispatch('favorite/projectGroup/load'),
+                vm.$store.dispatch('favorite/project/load'),
+                vm.$store.dispatch('favorite/cloudServiceType/load'),
+            ]);
         })();
 
         const getDomainList = async (): Promise<void> => {
             try {
                 const res = await SpaceConnector.client.identity.domain.list();
-                state.data = [
+                state.domainList = [
                     ...res.results.splice(144, DATA_LENGTH),
                 ];
             } catch (e) {
@@ -145,9 +184,19 @@ export default defineComponent({
     grid-gap: 1.25rem;
 }
 
+.daily-updates {
+    height: 33.75rem;
+}
+
+@screen lg {
+    .daily-updates {
+        height: 48rem;
+    }
+}
+
 .domain-tab {
     position: relative;
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
     ul {
         display: flex;
         flex-wrap: wrap;
