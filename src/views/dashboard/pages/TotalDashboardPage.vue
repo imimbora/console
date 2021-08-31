@@ -42,16 +42,16 @@
                         widget-wrapper"
                 >
                     <favorites-widget class="hidden lg:block col-span-12"
-                                      :project="project" :cloud-service="cloudService"
+                                      :project="project" :cloud-service="cloudService" :extra-params="extraParams"
                     />
                     <daily-updates class="col-span-12 daily-updates"
-                                   :providers="providers"
+                                   :providers="providers" :extra-params="extraParams"
                     />
                 </div>
                 <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
                 >
-                    <service-accounts class="col-span-12" :providers="providers" />
+                    <service-accounts class="col-span-12" :providers="providers" :extra-params="extraParams" />
                     <collector-progress class="col-span-12 collector-progress" :extra-params="extraParams" />
                     <cloud-services class="col-span-12 cloud-services" :more-info="true" :extra-params="extraParams" />
                 </div>
@@ -81,7 +81,6 @@ import ServiceAccounts from '@/views/dashboard/modules/ServiceAccounts.vue';
 import CollectorProgress from '@/views/dashboard/modules/CollectingProgress.vue';
 import CloudServices from '@/common/modules/CloudServices.vue';
 
-const DATA_LENGTH = 13;
 
 export default defineComponent({
     name: 'TotalDashboardPage',
@@ -128,9 +127,7 @@ export default defineComponent({
         const getDomainList = async (): Promise<void> => {
             try {
                 const res = await SpaceConnector.client.identity.domain.list();
-                state.domainList = [
-                    ...res.results.splice(144, DATA_LENGTH),
-                ];
+                state.domainList = res.results.splice(144, 13);
             } catch (e) {
                 console.error(e);
             }
