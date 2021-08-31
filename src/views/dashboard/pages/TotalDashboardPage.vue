@@ -62,7 +62,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive, ref, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PButton } from '@spaceone/design-system';
@@ -82,7 +82,7 @@ import CollectorProgress from '@/views/dashboard/modules/CollectingProgress.vue'
 import CloudServices from '@/common/modules/CloudServices.vue';
 
 
-export default defineComponent({
+export default {
     name: 'TotalDashboardPage',
     components: {
         PButton,
@@ -143,7 +143,7 @@ export default defineComponent({
             switchDomain,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
