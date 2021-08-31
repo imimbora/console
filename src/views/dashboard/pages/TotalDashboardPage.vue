@@ -160,8 +160,8 @@ export default {
 }
 
 .contents-wrapper {
-    display: grid;
     @apply grid-cols-12;
+    display: grid;
     grid-auto-flow: row;
     grid-gap: 1.25rem;
 }
