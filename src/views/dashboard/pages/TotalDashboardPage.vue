@@ -8,20 +8,13 @@
             <p class="text-xl font-bold mb-4">
                 ROOT DOMAIN - TOTAL DASHBOARD
             </p>
-            <!-- To use spaceone design system components, see storybook. -->
-            <p-button class="mb-4" size="sm" style-type="secondary"
-                      :outline="true"
-                      @click="test = !test"
-            >
-                Click me to {{ test ? 'STOP insert' : 'INSERT' }} 'test' to api parameters
-            </p-button>
         </div>
 
         <!-- KB Domain Tab -->
         <div class="domain-tab">
             <ul>
                 <li v-for="(item, index) in domainList" :key="index">
-                    <button :class="['btn', { 'active': item.domain_id === currentDomain.domainId }]"
+                    <button :class="['btn', { 'active': item.domain_id === extraParams.domainId }]"
                             @click="switchDomain(item)"
                     >
                         {{ item.name }}
@@ -31,7 +24,7 @@
         </div>
 
         <!-- If you want to reload when the state is changed, bind key with reactive state. -->
-        <div :key="test.toString()" class="contents-wrapper">
+        <div :key="extraParams.domainId" class="contents-wrapper">
             <!-- Give extra parameter objects for api requests in widgets. -->
             <div class="col-span-12 lg:col-span-9
                         widget-wrapper"
@@ -49,10 +42,10 @@
                         widget-wrapper"
                 >
                     <favorites-widget class="hidden lg:block col-span-12"
-                                  :project="project" :cloud-service="cloudService"
+                                      :project="project" :cloud-service="cloudService"
                     />
                     <daily-updates class="col-span-12 daily-updates"
-                               :providers="providers"
+                                   :providers="providers"
                     />
                 </div>
                 <div class="col-span-12 sm:col-span-6 lg:col-span-12
@@ -74,6 +67,8 @@ import {
 
 import { PButton } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import AllSummary from '@/views/dashboard/modules/AllSummary.vue';
 import ResourceMap from '@/views/dashboard/modules/ResourceMap.vue';
@@ -85,8 +80,6 @@ import DailyUpdates from '@/common/modules/DailyUpdates.vue';
 import ServiceAccounts from '@/views/dashboard/modules/ServiceAccounts.vue';
 import CollectorProgress from '@/views/dashboard/modules/CollectingProgress.vue';
 import CloudServices from '@/common/modules/CloudServices.vue';
-
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 const DATA_LENGTH = 13;
 
@@ -109,10 +102,8 @@ export default defineComponent({
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            test: false,
-            extraParams: computed(() => (state.test ? state.currentDomain : {})),
+            extraParams: computed(() => vm.$store.state.domain),
             domainList: [],
-            currentDomain: computed(() => vm.$store.state.domain),
             providers: computed(() => vm.$store.state.resource.provider.items),
             project: computed(() => [...vm.$store.getters['favorite/projectGroup/sortedItems'], ...vm.$store.getters['favorite/project/sortedItems']]),
             cloudService: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
