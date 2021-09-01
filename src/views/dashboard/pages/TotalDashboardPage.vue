@@ -62,7 +62,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive, ref, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PButton } from '@spaceone/design-system';
@@ -82,7 +82,7 @@ import CollectorProgress from '@/views/dashboard/modules/CollectingProgress.vue'
 import CloudServices from '@/common/modules/CloudServices.vue';
 
 
-export default defineComponent({
+export default {
     name: 'TotalDashboardPage',
     components: {
         PButton,
@@ -109,20 +109,6 @@ export default defineComponent({
             timezone: computed(() => vm.$store.state.user.timezone || 'UTC'),
         });
 
-        /** Init */
-        (async () => {
-            // Widgets does not load required resources.
-            // Page components need to load resources first.
-            await Promise.all([
-                vm.$store.dispatch('resource/provider/load'),
-                vm.$store.dispatch('resource/projectGroup/load'),
-                vm.$store.dispatch('resource/project/load'),
-                vm.$store.dispatch('resource/cloudServiceType/load'),
-                vm.$store.dispatch('favorite/projectGroup/load'),
-                vm.$store.dispatch('favorite/project/load'),
-                vm.$store.dispatch('favorite/cloudServiceType/load'),
-            ]);
-        })();
 
         const getDomainList = async (): Promise<void> => {
             try {
@@ -132,18 +118,33 @@ export default defineComponent({
                 console.error(e);
             }
         };
-        getDomainList();
 
         const switchDomain = (domain) => {
             vm.$store.dispatch('domain/load', domain.name);
         };
+
+        /** Init */
+        (async () => {
+            // Widgets does not load required resources.
+            // Page components need to load resources first.
+            await Promise.allSettled([
+                vm.$store.dispatch('resource/provider/load'),
+                vm.$store.dispatch('resource/projectGroup/load'),
+                vm.$store.dispatch('resource/project/load'),
+                vm.$store.dispatch('resource/cloudServiceType/load'),
+                vm.$store.dispatch('favorite/projectGroup/load'),
+                vm.$store.dispatch('favorite/project/load'),
+                vm.$store.dispatch('favorite/cloudServiceType/load'),
+                getDomainList(),
+            ]);
+        })();
 
         return {
             ...toRefs(state),
             switchDomain,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
@@ -159,8 +160,8 @@ export default defineComponent({
 }
 
 .contents-wrapper {
-    display: grid;
     @apply grid-cols-12;
+    display: grid;
     grid-auto-flow: row;
     grid-gap: 1.25rem;
 }
