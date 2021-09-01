@@ -14,11 +14,12 @@
         <div class="domain-tab">
             <ul>
                 <li v-for="(item, index) in domainList" :key="index">
-                    <button :class="['btn', { 'active': item.domain_id === extraParams.domainId }]"
-                            @click="switchDomain(item)"
+                    <p-button :class="{ 'active': item.domain_id === extraParams.domainId }"
+                              class="btn"
+                              @click="switchDomain(item)"
                     >
                         {{ item.name }}
-                    </button>
+                    </p-button>
                 </li>
             </ul>
         </div>
@@ -109,7 +110,6 @@ export default {
             timezone: computed(() => vm.$store.state.user.timezone || 'UTC'),
         });
 
-
         const getDomainList = async (): Promise<void> => {
             try {
                 const res = await SpaceConnector.client.identity.domain.list();
@@ -160,8 +160,7 @@ export default {
 }
 
 .contents-wrapper {
-    @apply grid-cols-12;
-    display: grid;
+    @apply grid grid-cols-12;
     grid-auto-flow: row;
     grid-gap: 1.25rem;
 }
@@ -185,7 +184,7 @@ export default {
 
 .domain-tab {
     position: relative;
-    margin-bottom: 2.5rem;
+    margin-bottom: 3rem;
     ul {
         display: flex;
         flex-wrap: wrap;
@@ -202,16 +201,18 @@ export default {
         width: 100%;
         height: 3rem;
         padding: 0 20px;
-        text-align: center;
         white-space: nowrap;
         text-overflow: ellipsis;
+        font-weight: 400;
+        font-size: 1rem;
+        color: #444;
         background-color: #eee;
         border-radius: 4px;
         &:hover {
             background-color: #e9e9e9;
         }
         &.active {
-            font-weight: bold;
+            font-weight: 700;
             color: #fff;
             @apply bg-primary;
         }
