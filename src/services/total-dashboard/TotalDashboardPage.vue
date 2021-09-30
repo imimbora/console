@@ -112,8 +112,8 @@ export default {
 
         const getDomainList = async (): Promise<void> => {
             try {
-                const res = await SpaceConnector.client.identity.domain.list();
-                state.domainList = res.results;
+                const { results } = await SpaceConnector.client.identity.domain.list();
+                state.domainList = results;
             } catch (e) {
                 console.error(e);
             }
