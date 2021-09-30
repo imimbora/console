@@ -11,7 +11,7 @@
         </div>
 
         <!-- KB Domain Tab -->
-        <div class="domain-tab">
+        <div v-if="domainList.length > 0" class="domain-tab">
             <ul>
                 <li v-for="(item, index) in domainList" :key="index">
                     <p-button :class="{ 'active': item.domain_id === extraParams.domainId }"
@@ -113,7 +113,7 @@ export default {
         const getDomainList = async (): Promise<void> => {
             try {
                 const res = await SpaceConnector.client.identity.domain.list();
-                state.domainList = res.results.splice(144, 13);
+                state.domainList = res.results;
             } catch (e) {
                 console.error(e);
             }
@@ -184,14 +184,15 @@ export default {
 
 .domain-tab {
     position: relative;
-    margin-bottom: 3rem;
+    margin-bottom: 40px;
+    overflow: hidden;
     ul {
         display: flex;
         flex-wrap: wrap;
-        margin: 0 -10px;
+        margin: -16px -10px 0;
         li {
             width: 20%;
-            margin-top: 1rem;
+            margin-top: 16px;
             padding: 0 10px;
         }
     }
