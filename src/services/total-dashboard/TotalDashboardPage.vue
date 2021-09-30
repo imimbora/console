@@ -184,16 +184,16 @@ export default {
 
 .domain-tab {
     position: relative;
-    margin-bottom: 40px;
+    margin-bottom: 2.5rem;
     overflow: hidden;
     ul {
         display: flex;
         flex-wrap: wrap;
-        margin: -16px -10px 0;
+        margin: -1rem -0.5rem 0;
         li {
             width: 20%;
-            margin-top: 16px;
-            padding: 0 10px;
+            margin-top: 1rem;
+            padding: 0 0.5rem;
         }
     }
     .btn {
@@ -201,14 +201,14 @@ export default {
         display: block;
         width: 100%;
         height: 3rem;
-        padding: 0 20px;
+        padding: 0 1rem;
         white-space: nowrap;
         text-overflow: ellipsis;
         font-weight: 400;
         font-size: 1rem;
         color: #444;
         background-color: #eee;
-        border-radius: 4px;
+        border-radius: 0.25rem;
         &:hover {
             background-color: #e9e9e9;
         }
