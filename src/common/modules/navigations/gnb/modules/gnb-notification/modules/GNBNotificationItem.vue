@@ -19,7 +19,7 @@
                                @mouseenter="link ? changeLinkMouseEnterState(true) : undefined"
                                @mouseleave="link ? changeLinkMouseEnterState(false) : undefined"
                     >
-                        {{ contents }}
+                        <span>{{ contents }}</span>
                     </component>
                 </p-collapsible-panel>
                 <div class="datetime">
@@ -149,6 +149,7 @@ export default {
         }
         .contents {
             opacity: 0.8;
+            white-space: pre-line;
 
             &.link {
                 @apply text-blue-800;

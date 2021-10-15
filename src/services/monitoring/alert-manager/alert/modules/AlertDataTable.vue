@@ -102,12 +102,12 @@
                 <template #col-webhook_id-format="{ value }">
                     {{ value ? (webhooks[value] ? webhooks[value].label : value) : ' ' }}
                 </template>
-                <template #col-triggered_by-format="{ value }">
-                    {{ value ? triggeredByFormatter(value) : ' ' }}
+                <template #col-triggered_by-format="{ value, item }">
+                    <alert-triggered-by :value="value" :project-id="item.project_id" disable-link />
                 </template>
             </p-toolbox-table>
         </div>
-        <alert-form-modal :visible.sync="visibleAlertFormModal" :project-id="projectId" @refresh="getAlerts()" />
+        <alert-form-modal :visible.sync="visibleAlertFormModal" :project-id="projectId" @confirm="onAlertFormConfirm" />
     </fragment>
 </template>
 <script lang="ts">
@@ -149,7 +149,8 @@ import {
 import {
     AlertBottomFilters, AlertListTableFilters,
 } from '@/services/monitoring/alert-manager/type';
-import { alertStateBadgeStyleTypeFormatter, triggeredByFormatter } from '@/services/monitoring/alert-manager/lib/helper';
+import { alertStateBadgeStyleTypeFormatter } from '@/services/monitoring/alert-manager/lib/helper';
+import AlertTriggeredBy from '@/services/monitoring/alert-manager/alert/modules/AlertTriggeredBy.vue';
 
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
@@ -161,6 +162,7 @@ export default {
         AlertFormModal,
         AlertTableBottomFilters,
         AlertActions,
+        AlertTriggeredBy,
         PToolboxTable,
         PIconTextButton,
         PPanelTop,
@@ -398,6 +400,11 @@ export default {
             await getAlerts();
         };
 
+        const onAlertFormConfirm = () => {
+            emit('change-list');
+            getAlerts();
+        };
+
         /* Init */
         const initPage = () => {
             (async () => {
@@ -435,10 +442,10 @@ export default {
             onChange,
             onExportToExcel,
             onUpdateBottomFilters,
+            onAlertFormConfirm,
             iso8601Formatter,
             alertDurationFormatter,
             commaFormatter,
-            triggeredByFormatter,
         };
     },
 };
@@ -448,8 +455,10 @@ export default {
     @apply col-span-12;
     .p-toolbox-table::v-deep {
         @apply overflow-hidden rounded-l;
-        .panel-top-wrapper {
+        .top-wrapper {
             @apply bg-white;
+        }
+        .panel-top-wrapper {
             .p-panel-top {
                 margin-top: 1.5rem;
             }
